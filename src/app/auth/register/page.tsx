@@ -16,7 +16,7 @@ type RegisterFormData = {
   captcha: string;
 };
 
-const DEFAULT_CAPTCHA = 'ABCDEF';
+const DEFAULT_CAPTCHA = 'AbCdEf';
 
 const RegisterPage = () => {
   const router = useRouter();
@@ -51,10 +51,11 @@ const RegisterPage = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 w-full">
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
-            Username <span className="text-red-500">*</span>
+          <label htmlFor="username" className="text-sm font-medium text-gray-700">
+            Username <span className="text-gray-700">(max 8 karakter)</span>
           </label>
           <input
+            id="username"
             {...register('username', { required: 'Username wajib diisi' })}
             className={`w-full px-4 py-2.5 rounded-lg border ${
               errors.username ? 'border-red-500' : 'border-gray-300'
@@ -68,7 +69,7 @@ const RegisterPage = () => {
 
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700">
-            Email <span className="text-red-500">*</span>
+            Email 
           </label>
           <input
             type="email"
@@ -114,7 +115,7 @@ const RegisterPage = () => {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Confirm Password</label>
+          <label className="text-sm font-medium text-gray-700">Konfirmasi Password</label>
           <input
             type="password"
             {...register('confirmPassword', {
