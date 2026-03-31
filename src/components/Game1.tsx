@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 
 export default function Game1() {
   const holes = Array.from({ length: 9 });
@@ -35,31 +34,25 @@ export default function Game1() {
     if (!gameActive) return;
 
     const countdown = setInterval(() => {
-      setTime((prev) => {
-        if (prev <= 1) {
-          clearInterval(countdown);
-          setGameActive(false);
-
-          toast.info("⏰ Waktu habis!", {
-            autoClose: 1500,
-          });
-
-          if (score > highScore) {
-            localStorage.setItem("whack_highscore", score.toString());
-            setHighScore(score);
-            toast.success("🎉 New High Score!", {
-              autoClose: 1500,
-            });
-          }
-
-          return 0;
-        }
-        return prev - 1;
-      });
+      setTime((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
 
     return () => clearInterval(countdown);
-  }, [gameActive, score, highScore]);
+  }, [gameActive]);
+
+  useEffect(() => {
+    if (time === 0 && gameActive) {
+      setGameActive(false);
+
+      toast.info("⏰ Waktu habis!");
+
+      if (score > highScore) {
+        localStorage.setItem("whack_highscore", score.toString());
+        setHighScore(score);
+        toast.success("🎉 New High Score!");
+      }
+    }
+  }, [time, gameActive]);
 
   const hitMole = (index: number) => {
     if (index === moleIndex && gameActive) {
@@ -73,58 +66,82 @@ export default function Game1() {
     setTime(30);
     setGameActive(true);
 
-    toast.info("⏱️ Waktu dimulai! Kamu punya 30 detik!", {
-      autoClose: 1500,
-    });
+    toast.info("⏱️ Game dimulai!");
   };
 
   return (
-    <div className="game-container">
-      <div className="game-panel">
-        <h1 className="game-title">🎮 Tap the Mouse</h1>
+    <div className="min-h-screen flex items-center justify-center 
+      bg-gradient-to-br from-orange-400 via-amber-500 to-yellow-600 p-4 mt-5">
 
-        <div className="game-stats">
-          <div className="score">🏆 Score: {score}</div>
-          <div className="timer">⏱️ Time: {time}</div>
+      {/* 🎮 MAIN CARD */}
+      <div className="w-full max-w-4xl 
+        bg-gradient-to-br from-orange-500/80 to-amber-600/80 
+        backdrop-blur-xl p-6 rounded-3xl 
+        shadow-[0_20px_60px_rgba(0,0,0,0.5)] 
+        border border-white/20 text-white">
+
+        {/* 🔥 HEADER */}
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-extrabold drop-shadow-lg">
+            🐹 Tap the Mouse
+          </h1>
+          <p className="text-white/80 mt-2">
+            Klik tikus secepat mungkin sebelum waktu habis!
+          </p>
         </div>
 
-        <div className="highscore">
-          ⭐ High Score: {highScore}
+        <hr className="border-white/20 mb-6" />
+
+        {/* 📊 INFO */}
+        <div className="flex justify-between items-center 
+          bg-white/10 backdrop-blur-md p-4 rounded-xl mb-6 shadow-inner">
+
+          <span>🏆 Score: {score}</span>
+          <span>⏱️ Time: {time}</span>
+          <span>⭐ High: {highScore}</span>
+
         </div>
 
-        {!gameActive && (
-          <button className="start-btn" onClick={startGame}>
-            🚀 Start Game
-          </button>
-        )}
-      </div>
+        {/* 🎮 GAME AREA */}
+        <div className="grid grid-cols-3 gap-4 
+          bg-gradient-to-br from-slate-800 to-slate-900 
+          p-6 rounded-2xl border border-white/10 shadow-inner">
 
-      <div className="game-grid">
-        {holes.map((_, index) => (
-          <div
-            key={index}
-            onClick={() => hitMole(index)}
-            className="hole"
-          >
-            {moleIndex === index && (
-              <div className="mole">🐹</div>
-            )}
-          </div>
-        ))}
-      </div>
+          {holes.map((_, index) => (
+            <div
+              key={index}
+              onClick={() => hitMole(index)}
+              className="bg-black/40 h-20 rounded-xl flex items-center justify-center 
+                cursor-pointer hover:scale-105 active:scale-95 transition"
+            >
+              {moleIndex === index && (
+                <div className="text-4xl animate-bounce">
+                  🐹
+                </div>
+              )}
+            </div>
+          ))}
 
-      <ToastContainer
-        position="top-center"
-        autoClose={1500}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
+        </div>
+
+        {/* 🎯 BUTTON */}
+        <div className="mt-6 flex flex-col items-center gap-4">
+
+          {!gameActive && (
+            <button
+              onClick={startGame}
+              className="w-full max-w-md 
+              bg-gradient-to-r from-yellow-400 to-orange-500 
+              py-3 rounded-xl font-bold text-lg 
+              hover:scale-105 active:scale-95 
+              transition-all duration-200">
+              🚀 Start Game
+            </button>
+          )}
+
+        </div>
+
+      </div>
     </div>
   );
 }
